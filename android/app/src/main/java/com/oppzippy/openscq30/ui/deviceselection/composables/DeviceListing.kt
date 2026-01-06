@@ -14,13 +14,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -132,6 +136,7 @@ private fun CenteredScrollableBox(content: @Composable () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DeviceList(
     devices: List<PairedDevice>,
@@ -177,24 +182,30 @@ fun DeviceList(
         userScrollEnabled = true,
     ) {
         items(devices) { device ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .combinedClickable(
-                        onClick = { onDeviceClick(device) },
-                        onLongClick = { deviceToUnpair = device },
-                    )
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-            ) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            ListItem(
+                tonalElevation = 5.dp,
+                headlineContent = {
                     Text(text = translateDeviceModel(device.model))
 
                     if (device.isDemo) {
                         Text(text = stringResource(R.string.demo), color = MaterialTheme.colorScheme.secondary)
                     }
-                }
-                Text(text = device.macAddress)
-            }
+                },
+                supportingContent = {
+                    Text(text = device.macAddress)
+                },
+                leadingContent = {
+                    Icon(Icons.Filled.Headphones, contentDescription = "Localized description")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .clip(MaterialTheme.shapes.large)
+                    .combinedClickable(
+                        onClick = { onDeviceClick(device) },
+                        onLongClick = { deviceToUnpair = device },
+                    ),
+            )
         }
     }
 }
